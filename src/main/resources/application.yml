@@ -1,0 +1,17 @@
+logging:
+  level:
+    org.apache.zookeeper.ClientCnxn: WARN
+
+spring:
+  application:
+    name: auth-service
+  cloud:
+    zookeeper:
+      connect-string: localhost:2181
+      discovery:
+        enabled: true
+        root: /services
+        instance-id: ${spring.application.name}:${server.port}}
+
+server:
+  port: 8083
