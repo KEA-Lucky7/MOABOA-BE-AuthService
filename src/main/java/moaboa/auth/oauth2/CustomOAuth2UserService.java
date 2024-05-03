@@ -1,11 +1,9 @@
 package moaboa.auth.oauth2;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import moaboa.auth.oauth2.userinfo.CustomOAuth2User;
 import moaboa.auth.oauth2.userinfo.OAuthAttributes;
 import moaboa.auth.user.User;
-import moaboa.auth.user.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -21,10 +19,7 @@ import static moaboa.auth.oauth2.SocialType.KAKAO;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-
-    private final UserRepository userRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -45,15 +40,15 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         // socialType에 따라 유저 정보를 통해 OAuthAttributes 객체 생성
         OAuthAttributes extractAttributes = OAuthAttributes.of(socialType, userNameAttributeName, attributes);
-        User createdUser = getUser(extractAttributes, socialType); // getUser() 메소드로 User 객체 생성 후 반환
+        User createdUser = extractAttributes.toEntity(socialType, extractAttributes.getOauth2UserInfo());
 
         log.info("oauth2 유저 생성");
         return new CustomOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("USER")),
                 attributes,
                 extractAttributes.getNameAttributeKey(),
-                createdUser.getEmail()
-//                createdUser.getRole()
+                createdUser.getEmail(),
+                createdUser.getSocialType()
         );
     }
 
@@ -65,32 +60,5 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             return KAKAO;
         }
         return SocialType.GOOGLE;
-    }
-
-    /**
-     * SocialType과 attributes에 들어있는 소셜 로그인의 식별값 id를 통해 회원을 찾아 반환하는 메소드
-     * 만약 찾은 회원이 있다면, 그대로 반환하고 없다면 saveUser()를 호출하여 회원을 저장한다.
-     */
-    private User getUser(OAuthAttributes attributes, SocialType socialType) {
-        log.info("getUser 실행");
-        User findUser = userRepository.findBySocialTypeAndSocialId(
-                socialType,
-                attributes.getOauth2UserInfo().getId()
-        ).orElse(null);
-
-        if (findUser == null) {
-            return saveUser(attributes, socialType);
-        }
-        return findUser;
-    }
-
-    /**
-     * OAuthAttributes의 toEntity() 메소드를 통해 빌더로 User 객체 생성 후 반환
-     * 생성된 User 객체를 DB에 저장 : socialType, socialId, email, role 값만 있는 상태
-     */
-    private User saveUser(OAuthAttributes attributes, SocialType socialType) {
-        log.info("save user 실행");
-        User createdUser = attributes.toEntity(socialType, attributes.getOauth2UserInfo());
-        return userRepository.save(createdUser);
     }
 }
