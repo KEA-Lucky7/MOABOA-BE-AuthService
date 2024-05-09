@@ -21,26 +21,26 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
-    private static final String NO_CHECK_URL = "/login";
+    private static final String NO_CHECK_URL = "/login/**";
 
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
-
     private final GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getRequestURI().equals(NO_CHECK_URL)) {
-            filterChain.doFilter(request, response); // "/login" 요청이 들어오면, 다음 필터 호출
-            return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
+            if (request.getRequestURI().equals(NO_CHECK_URL)) {
+            filterChain.doFilter(request, response);
+                return; //  이후 현재 필터 진행 막기
         }
 
         // 사용자 요청 헤더에서 RefreshToken 추출
-        // -> RefreshToken이 없거나 유효하지 않다면(DB에 저장된 RefreshToken과 다르다면) null 반환
-        // 사용자의 요청 헤더에 RefreshToken이 있는 경우는, AccessToken이 만료되어 요청한 경우밖에 없다.
+        // -> RefreshToken이 없거나 유효 X or DB에 저장된 RefreshToken과 다르다면 => null 반환
+        // 사용자의 요청 헤더에 RefreshToken이 있는 경우는, AccessToken이 만료되어 요청한 경우
         // 따라서, 위의 경우를 제외하면 추출한 refreshToken은 모두 null
         String refreshToken = jwtUtil.extractRefreshToken(request)
                 .filter(jwtUtil::isTokenValid)
@@ -88,36 +88,28 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 //        user.updateRefreshToken(reIssuedRefreshToken);
 //        userRepository.saveAndFlush(user);
 //        return reIssuedRefreshToken;
-        return "refresh~";
+        return "refresh";
     }
 
     public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
                                                   FilterChain filterChain) throws ServletException, IOException {
         log.info("checkAccessTokenAndAuthentication() 호출");
         jwtUtil.extractAccessToken(request)
-                .filter(jwtUtil::isTokenValid)
-                .ifPresent(accessToken -> jwtUtil.extractEmail(accessToken)
-                        .ifPresent(email -> userRepository.findByEmail(email)
-                                .ifPresent(this::saveAuthentication)));
+                .filter(jwtUtil::isTokenValid);
+//                .ifPresent(accessToken -> jwtUtil.extractEmail(accessToken)
+//                        .ifPresent(email -> userRepository.findByEmail(email).ifPresent(this::saveAuthentication)));
 
         filterChain.doFilter(request, response);
     }
 
-    public void saveAuthentication(User myUser) {
-        String password = myUser.getPassword();
-        if (password == null) { // 소셜 로그인 유저의 비밀번호 임의로 설정 하여 소셜 로그인 유저도 인증 되도록 설정
-            password = "temp-password";
-        }
-
-        UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
-                .username(myUser.getEmail())
-                .password(password)
-                .build();
-
-        Authentication authentication =
-                new UsernamePasswordAuthenticationToken(userDetailsUser, null,
-                        authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
+//    public void saveAuthentication(User myUser) {
+//        UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
+//                .build();
+//
+//        Authentication authentication =
+//                new UsernamePasswordAuthenticationToken(userDetailsUser, null,
+//                        authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities()));
+//
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//    }
 }

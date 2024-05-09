@@ -34,40 +34,37 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
+        return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 // h2 enable
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
 
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers(
-                                        new AntPathRequestMatcher("/auth/**")
-                                ).authenticated()
-                                .requestMatchers(
-                                        new AntPathRequestMatcher("/"),
-                                        new AntPathRequestMatcher("/index.html"),
-                                        new AntPathRequestMatcher("/h2-console/**")
-                                ).permitAll()
-                                .anyRequest().authenticated()
-                );
-
-        http.oauth2Login(oauth2 -> oauth2
-                .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-                .defaultSuccessUrl("/")
-                .successHandler(oAuth2LoginSuccessHandler)
-                .failureHandler(oAuth2LoginFailureHandler)
-                .permitAll()
-        );
-
-        // create no session
-        http.sessionManagement(sessionManagement ->
-                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        );
-
-        http.addFilterBefore(new JwtAuthenticationProcessingFilter(jwtUtil, jwtUtil.getUserRepository()), UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/auth/**")
+                        ).authenticated()
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/"),
+                                new AntPathRequestMatcher("/index.html"),
+                                new AntPathRequestMatcher("/h2-console/**"),
+                                new AntPathRequestMatcher("/login/*"),
+                                new AntPathRequestMatcher("/oauth2/*")
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .defaultSuccessUrl("/")
+                        .successHandler(oAuth2LoginSuccessHandler)
+                        .failureHandler(oAuth2LoginFailureHandler)
+                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+                )
+                .sessionManagement(sessionManagement ->
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .addFilterBefore(new JwtAuthenticationProcessingFilter(jwtUtil, jwtUtil.getUserRepository()), UsernamePasswordAuthenticationFilter.class
+                )
+                .build();
     }
 
     @Bean
@@ -76,17 +73,30 @@ public class SecurityConfig {
     }
 
 //    @Bean
-//    public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
-//        JwtAuthenticationProcessingFilter jwtAuthenticationFilter = new JwtAuthenticationProcessingFilter(jwtUtil);
-//        return jwtAuthenticationFilter;
+//    public WebSecurityCustomizer webSecurityCustomizer() {
+//        return (web) -> web.ignoring()
+//                .requestMatchers("/", "/favicon.ico", "/css/**","/images/**","/js/**", "/index.html")
+//                .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+//                .requestMatchers(PathRequest.toH2Console());
 //    }
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring()
-                .requestMatchers("/", "/favicon.ico", "/css/**","/images/**","/js/**", "/index.html")
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
-                .requestMatchers(PathRequest.toH2Console());
-    }
+//    @Bean
+//    public AccessDeniedHandler accessDeniedHandler() {
+//        return (request, response, accessDeniedException) -> {
+//
+//            CustomException customException = new ForbiddenException("forbidden", this.getClass().toString());
+//            ErrorResponse errorResponse =
+//                    new ErrorResponse(customException.getErrorType(), customException.getMessage(), customException.getPath());
+//
+//            Map<String, Object> responseBody = new HashMap<>();
+//            responseBody.put("status", "FAILED");
+//            responseBody.put("data", errorResponse);
+//
+//            response.setStatus(200);
+//            response.setContentType("application/json;charset=UTF-8");
+//            response.getWriter().write(new ObjectMapper().writeValueAsString(responseBody));
+//        };
+//    }
+
 
 }

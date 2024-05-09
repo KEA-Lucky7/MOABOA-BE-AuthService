@@ -3,10 +3,10 @@ package moaboa.auth.oauth2.userinfo;
 import lombok.Builder;
 import lombok.Getter;
 import moaboa.auth.oauth2.SocialType;
+import moaboa.auth.user.Role;
 import moaboa.auth.user.User;
 
 import java.util.Map;
-import java.util.UUID;
 
 @Getter
 public class OAuthAttributes {
@@ -59,19 +59,15 @@ public class OAuthAttributes {
 //                .build();
 //    }
 
-//    /**
-//     * of메소드로 OAuthAttributes 객체가 생성되어, 유저 정보들이 담긴 OAuth2UserInfo가 소셜 타입별로 주입된 상태
-//     * OAuth2UserInfo에서 socialId(식별값), nickname, imageUrl을 가져와서 build
-//     * email에는 UUID로 중복 없는 랜덤 값 생성
-//     * role은 GUEST로 설정
-//     */
+    /**
+     * of메소드로 OAuthAttributes 객체가 생성되어, 유저 정보들이 담긴 OAuth2UserInfo가 소셜 타입별로 주입된 상태
+     * role은 GUEST로 설정
+     */
     public User toEntity(SocialType socialType, OAuth2UserInfo oauth2UserInfo) {
         return User.builder()
+                .role(Role.GUEST)
                 .socialType(socialType)
                 .socialId(oauth2UserInfo.getId())
-                .email(UUID.randomUUID() + "@socialUser.com")
-                .nickname(oauth2UserInfo.getNickname())
-                .imageUrl(oauth2UserInfo.getImageUrl())
                 .build();
     }
 }

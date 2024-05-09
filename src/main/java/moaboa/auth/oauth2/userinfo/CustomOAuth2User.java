@@ -12,15 +12,15 @@ import java.util.Map;
 public class CustomOAuth2User extends DefaultOAuth2User {
 
     private SocialType socialType;
-    private String email;
+    private String id;
 
     public CustomOAuth2User(Collection<? extends GrantedAuthority> authorities,
                             Map<String, Object> attributes,
                             String nameAttributeKey,
-                            String email,
+                            String id,
                             SocialType socialType) {
         super(authorities, attributes, nameAttributeKey);
-        this.email = email;
+        this.id = id;
         this.socialType = socialType;
     }
 }

@@ -17,13 +17,13 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    private String email; // 이메일
-    private String password; // 비밀번호
-    private String nickname; // 닉네임
-    private String imageUrl; // 프로필 이미지
+    private String name;
 
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
 
     private String socialId;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 }

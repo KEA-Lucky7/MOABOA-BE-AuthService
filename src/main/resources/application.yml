@@ -23,9 +23,6 @@ spring:
 #        root: /services
 #        instance-id: ${spring.application.name}:${server.port}}
   security:
-#    user:
-#      name: user
-#      password: password
     oauth2:
       client:
         registration:
@@ -36,7 +33,7 @@ spring:
               - email
               - profile
           kakao:
-            client-id: ${KAKAO_CLEINT_ID}
+            client-id: ${KAKAO_CLIENT_ID}
             client-secret: ${KAKAO_CLEINT_SECRET}
             redirect-uri: ${KAKAO_REDIRECT_URI}
             authorization-grant-type: authorization_code
