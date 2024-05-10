@@ -39,8 +39,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
                 jwtUtil.sendAccessAndRefreshToken(response, accessToken, null);
                 // 여기서 프런트에 응답을 줘야할 듯
-                log.info("리다이렉트");
-                response.sendRedirect("/api/updateUser");
+                log.info("리다이렉트 해야함");
+//                response.sendRedirect("/login/clear");
             } else {
                 loginSuccess(response, user); // 로그인에 성공한 경우 access, refresh 토큰 생성
             }
