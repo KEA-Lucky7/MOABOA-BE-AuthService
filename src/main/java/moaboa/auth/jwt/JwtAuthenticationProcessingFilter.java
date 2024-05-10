@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import moaboa.auth.jwt.JwtUtil;
 import moaboa.auth.user.User;
 import moaboa.auth.user.UserRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -94,22 +94,28 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
                                                   FilterChain filterChain) throws ServletException, IOException {
         log.info("checkAccessTokenAndAuthentication() 호출");
-        jwtUtil.extractAccessToken(request)
-                .filter(jwtUtil::isTokenValid);
-//                .ifPresent(accessToken -> jwtUtil.extractEmail(accessToken)
-//                        .ifPresent(email -> userRepository.findByEmail(email).ifPresent(this::saveAuthentication)));
+        Optional<User> user = jwtUtil.extractAccessToken(request)
+                .filter(jwtUtil::isTokenValid)
+                .flatMap(accessToken -> jwtUtil.extractId(accessToken)
+                        .flatMap(id -> {
+                            log.info("id 감별");
+                            return userRepository.findById(Long.parseLong(id));
+                        }));
+        log.info("user: {}, isEmpty: {}", user, user.isEmpty());
+                user.ifPresent(this::saveAuthentication);
 
         filterChain.doFilter(request, response);
     }
 
-//    public void saveAuthentication(User myUser) {
-//        UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
-//                .build();
-//
-//        Authentication authentication =
-//                new UsernamePasswordAuthenticationToken(userDetailsUser, null,
-//                        authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities()));
-//
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-//    }
+    public void saveAuthentication(User user) {
+        UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
+                .roles(user.getRole().name())
+                .build();
+
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken(userDetailsUser, null,
+                        authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
 }

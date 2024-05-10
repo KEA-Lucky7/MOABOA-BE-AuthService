@@ -34,11 +34,13 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
             // 처음 요청한 회원
             if (user.getRole() == Role.GUEST) {
-                String accessToken = jwtUtil.createAccessToken(user.getSocialId());
+                String accessToken = jwtUtil.createAccessToken(user.getId());
                 response.addHeader(jwtUtil.getAccessHeader(), "Bearer " + accessToken);
 
                 jwtUtil.sendAccessAndRefreshToken(response, accessToken, null);
                 // 여기서 프런트에 응답을 줘야할 듯
+                log.info("리다이렉트");
+                response.sendRedirect("/api/updateUser");
             } else {
                 loginSuccess(response, user); // 로그인에 성공한 경우 access, refresh 토큰 생성
             }
@@ -50,8 +52,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     private void loginSuccess(HttpServletResponse response, User user) throws IOException {
         log.info("로그인 성공!");
-        String accessToken = jwtUtil.createAccessToken(user.getSocialId());
-        String refreshToken = jwtUtil.createRefreshToken(user.getSocialId());
+        String accessToken = jwtUtil.createAccessToken(user.getId());
+        String refreshToken = jwtUtil.createRefreshToken();
         response.addHeader(jwtUtil.getAccessHeader(), "Bearer " + accessToken);
         response.addHeader(jwtUtil.getRefreshHeader(), "Bearer " + refreshToken);
 

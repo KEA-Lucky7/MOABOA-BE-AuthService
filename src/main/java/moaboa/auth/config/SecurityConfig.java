@@ -10,6 +10,7 @@ import moaboa.auth.oauth2.handler.OAuth2LoginFailureHandler;
 import moaboa.auth.oauth2.handler.OAuth2LoginSuccessHandler;
 import moaboa.auth.response.ErrorCode;
 import moaboa.auth.response.ErrorResponse;
+import moaboa.auth.user.Role;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -59,6 +60,9 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/login/*"),
                                 new AntPathRequestMatcher("/oauth2/*")
                         ).permitAll()
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/api/members/createUser")
+                        ).hasRole(Role.GUEST.name())
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2

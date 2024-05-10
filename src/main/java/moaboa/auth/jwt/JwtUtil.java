@@ -43,24 +43,23 @@ public class JwtUtil {
     private final UserRepository userRepository;
 
 
-    public String createAccessToken(String email) {
+    public String createAccessToken(Long id) {
         Date now = new Date();
         return Jwts.builder()
                 .setHeaderParam("type", "jwt")
-                .claim("email", email)
+                .claim("id", id)
                 .subject(ACCESS_TOKEN_SUBJECT)
-                .subject(email)
+//                .subject(email)
                 .issuedAt(now)
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpirationPeriod))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
-    public String createRefreshToken(String email) {
+    public String createRefreshToken() {
         Date now = new Date();
         return Jwts.builder()
                 .subject(REFRESH_TOKEN_SUBJECT)
-                .subject(email)
                 .issuedAt(now)
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpirationPeriod))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
@@ -88,9 +87,10 @@ public class JwtUtil {
     }
 
     public Optional<String> extractAccessToken(HttpServletRequest request) {
+        log.info("액세스 헤더: {}", request.getHeader(accessHeader));
         return Optional.ofNullable(request.getHeader(accessHeader))
-                .filter(refreshToken -> refreshToken.startsWith(BEARER))
-                .map(refreshToken -> refreshToken.replace(BEARER, ""));
+                .filter(accessToken -> accessToken.startsWith(BEARER))
+                .map(accessToken -> accessToken.replace(BEARER, ""));
     }
 
     public Optional<String> extractRefreshToken(HttpServletRequest request) {
@@ -99,14 +99,15 @@ public class JwtUtil {
                 .map(refreshToken -> refreshToken.replace(BEARER, ""));
     }
 
-    public Optional<String> extractEmail(String accessToken) {
+    public Optional<String> extractId(String accessToken) {
         try {
+            log.info("토큰 아이디 추출");
             return Optional.ofNullable(Jwts.parser()
                     .setSigningKey(secretKey)
                     .build()
                     .parseClaimsJws(accessToken)
                     .getBody()
-                    .get("email", String.class));
+                    .get("id", String.class));
         } catch (Exception e) {
             log.error("액세스 토큰이 유효하지 않습니다.");
             return Optional.empty();
@@ -146,6 +147,7 @@ public class JwtUtil {
                     .parseClaimsJws(token);
 
             // 토큰 파싱이 성공적으로 이루어졌다면 토큰은 유효
+            log.info("토큰 유효");
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             log.error("유효하지 않은 토큰입니다. {}", e.getMessage());
