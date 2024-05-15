@@ -51,11 +51,18 @@ public class JwtUtil {
                 .setHeaderParam("type", "jwt")
                 .claim("id", id)
                 .subject(ACCESS_TOKEN_SUBJECT)
-//                .subject(email)
                 .issuedAt(now)
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpirationPeriod))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
+    }
+
+    /**
+     * AccessToken 재발급
+     */
+    public String reIssueAccessToken(Long id) {
+        log.info("Access Token 재발급");
+        return createAccessToken(id);
     }
 
     private String createRefreshToken(Long id) {
@@ -78,16 +85,10 @@ public class JwtUtil {
      * */
     private String findRefreshToken(Long userId) {
         return refreshTokenRepository.findById(userId)
-                .orElseGet(() -> createRefreshToken(userId));
-    }
-
-    /**
-     * AccessToken 헤더에 실어서 보내기
-     */
-    public void sendAccessToken(HttpServletResponse response, String accessToken) {
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setHeader(accessHeader, accessToken);
-        log.info("재발급된 Access Token : {}", accessToken);
+                .orElseGet(() -> {
+                    log.info("refreshToken 재발급");
+                    return createRefreshToken(userId);
+                });
     }
 
     /**
@@ -139,20 +140,6 @@ public class JwtUtil {
      */
     public void setRefreshTokenHeader(HttpServletResponse response, String refreshToken) {
         response.setHeader(refreshHeader, refreshToken);
-    }
-
-    /**
-     * RefreshToken DB 저장(업데이트)
-     * 이미 존재하는 RefreshToken이 있다면 업데이트
-     */
-    public void updateRefreshToken(Long userId) {
-//        refreshTokenRepository.findById(userId)
-//                .ifPresentOrElse();
-//        userRepository.findByEmail(email)
-//                .ifPresentOrElse(
-//                        user -> user.updateRefreshToken(refreshToken),
-//                        () -> new Exception("일치하는 회원이 없습니다.")
-//                );
     }
 
     public boolean isAccessTokenValid(String token) {

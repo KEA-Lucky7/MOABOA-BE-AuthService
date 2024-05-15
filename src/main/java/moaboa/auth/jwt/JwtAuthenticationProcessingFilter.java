@@ -72,22 +72,13 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
      */
     public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
         refreshTokenRepository.findMemberIdByToken(refreshToken)
-                .ifPresent(memberId -> {
-                    String reIssuedRefreshToken = reIssueRefreshToken(memberId);
-                    jwtUtil.sendAccessAndRefreshToken(
-                            response,
-                            jwtUtil.createAccessToken(memberId),
-                            reIssuedRefreshToken
-                    );
-                });
-    }
-
-    /**
-     * [리프레시 토큰 재발급 & DB에 리프레시 토큰 업데이트 메소드]
-     * jwtUtil.createRefreshToken()으로 리프레시 토큰 재발급 후 리턴
-     */
-    private String reIssueRefreshToken(Long memberId) {
-        return jwtUtil.getRefreshToken(memberId);
+                .ifPresent(memberId ->
+                        jwtUtil.sendAccessAndRefreshToken(
+                                response,
+                                jwtUtil.reIssueAccessToken(memberId),
+                                jwtUtil.getRefreshToken(memberId)
+                        )
+                );
     }
 
     public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
