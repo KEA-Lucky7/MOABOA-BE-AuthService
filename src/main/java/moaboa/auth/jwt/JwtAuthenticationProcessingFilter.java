@@ -87,10 +87,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         Optional<User> user = jwtUtil.extractAccessToken(request)
                 .filter(jwtUtil::isAccessTokenValid)
                 .flatMap(accessToken -> jwtUtil.extractId(accessToken)
-                        .flatMap(id -> {
-                            log.info("id 감별");
-                            return userRepository.findById(Long.parseLong(id));
-                        }));
+                        .flatMap(id -> userRepository.findById(Long.parseLong(id))));
         log.info("user: {}, isEmpty: {}", user, user.isEmpty());
                 user.ifPresent(this::saveAuthentication);
 
