@@ -35,11 +35,11 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             // 처음 요청한 회원
             if (user.getRole() == Role.GUEST) {
                 String accessToken = jwtUtil.createAccessToken(user.getId());
-                response.addHeader(jwtUtil.getAccessHeader(), "Bearer " + accessToken);
+                String refreshToken = jwtUtil.getRefreshToken(user.getId());
 
-                jwtUtil.sendAccessAndRefreshToken(response, accessToken, null);
-                // 여기서 프런트에 응답을 줘야할 듯
-                log.info("리다이렉트");
+                jwtUtil.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+                log.info("임시 회원가입 성공");
+                // 프런트에 회원가입 페이지 리다이렉션
                 response.sendRedirect("http://localhost:5173");
             } else {
                 loginSuccess(response, user); // 로그인에 성공한 경우 access, refresh 토큰 생성
@@ -53,12 +53,12 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private void loginSuccess(HttpServletResponse response, User user) throws IOException {
         log.info("로그인 성공!");
         String accessToken = jwtUtil.createAccessToken(user.getId());
-        String refreshToken = jwtUtil.createRefreshToken();
+        String refreshToken = jwtUtil.getRefreshToken(user.getId());
         response.addHeader(jwtUtil.getAccessHeader(), "Bearer " + accessToken);
         response.addHeader(jwtUtil.getRefreshHeader(), "Bearer " + refreshToken);
 
         jwtUtil.sendAccessAndRefreshToken(response, accessToken, refreshToken);
-//        jwtUtil.updateRefreshToken(oAuth2User.getEmail(), refreshToken);
+//        jwtUtil.updateRefreshToken(user.getId(), refreshToken);
     }
 
 }

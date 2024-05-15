@@ -6,12 +6,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import moaboa.auth.refresh.RefreshTokenRepository;
 import moaboa.auth.user.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 
 @Getter
 @Slf4j
@@ -34,13 +36,13 @@ public class JwtUtil {
     @Value("${jwt.refresh.header}")
     private String refreshHeader;
 
-
     private static final String ACCESS_TOKEN_SUBJECT = "AccessToken";
     private static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
     private static final String EMAIL_CLAIM = "email";
     private static final String BEARER = "Bearer ";
 
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
 
     public String createAccessToken(Long id) {
@@ -56,14 +58,27 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String createRefreshToken() {
-        Date now = new Date();
-        return Jwts.builder()
-                .subject(REFRESH_TOKEN_SUBJECT)
-                .issuedAt(now)
-                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpirationPeriod))
-                .signWith(SignatureAlgorithm.HS256, secretKey)
-                .compact();
+    private String createRefreshToken(Long id) {
+        String key = UUID.randomUUID().toString();
+        refreshTokenRepository.save(key, id);
+        return key;
+    }
+
+    public String getRefreshToken(Long id) {
+        Long userId = userRepository.findById(id)
+                .orElseThrow(RuntimeException::new)
+                .getId();
+
+        return findRefreshToken(userId);
+    }
+
+    /**
+     * 리프레시 토큰 가져오는 메소드
+     * redis에 존재하는 경우 가져오고 존재하지 않다면 새로 생성
+     * */
+    private String findRefreshToken(Long userId) {
+        return refreshTokenRepository.findById(userId)
+                .orElseGet(() -> createRefreshToken(userId));
     }
 
     /**
@@ -94,9 +109,7 @@ public class JwtUtil {
     }
 
     public Optional<String> extractRefreshToken(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(refreshHeader))
-                .filter(refreshToken -> refreshToken.startsWith(BEARER))
-                .map(refreshToken -> refreshToken.replace(BEARER, ""));
+        return Optional.ofNullable(request.getHeader(refreshHeader));
     }
 
     public Optional<String> extractId(String accessToken) {
@@ -130,16 +143,19 @@ public class JwtUtil {
 
     /**
      * RefreshToken DB 저장(업데이트)
+     * 이미 존재하는 RefreshToken이 있다면 업데이트
      */
-//    public void updateRefreshToken(String email, String refreshToken) {
+    public void updateRefreshToken(Long userId) {
+//        refreshTokenRepository.findById(userId)
+//                .ifPresentOrElse();
 //        userRepository.findByEmail(email)
 //                .ifPresentOrElse(
 //                        user -> user.updateRefreshToken(refreshToken),
 //                        () -> new Exception("일치하는 회원이 없습니다.")
 //                );
-//    }
+    }
 
-    public boolean isTokenValid(String token) {
+    public boolean isAccessTokenValid(String token) {
         try {
             Jws<Claims> jws = Jwts.parser()
                     .setSigningKey(secretKey)
@@ -150,7 +166,7 @@ public class JwtUtil {
             log.info("토큰 유효");
             return true;
         } catch (JwtException | IllegalArgumentException e) {
-            log.error("유효하지 않은 토큰입니다. {}", e.getMessage());
+            log.error("유효하지 않은 액세스 토큰입니다. {}", e.getMessage());
             return false;
         }
     }

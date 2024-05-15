@@ -1,5 +1,6 @@
 package moaboa.auth.refresh;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -10,25 +11,27 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Repository
 public class RefreshTokenRepository {
 
-    private RedisTemplate redisTemplate;
     @Value("${jwt.secret.expiration}")
     private Long refreshExpirePeriod;
+    private RedisTemplate redisTemplate;
 
     public RefreshTokenRepository(final RedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
-    public void save(Long memberId) {
-        String key = UUID.randomUUID().toString();
+    public void save(String refreshToken, Long memberId) {
         ValueOperations<String, Long> valueOperations = redisTemplate.opsForValue();
-        valueOperations.set(key, memberId);
-        redisTemplate.expire(key, refreshExpirePeriod, TimeUnit.SECONDS);
+        valueOperations.set(refreshToken, memberId);
+        redisTemplate.expire(refreshToken, refreshExpirePeriod, TimeUnit.SECONDS);
+        log.info("refresh Token 저장");
+
     }
 
-    public Optional<String> findById(final String refreshToken) {
+    public Optional<String> findByToken(final String refreshToken) {
         ValueOperations<String, Long> valueOperations = redisTemplate.opsForValue();
         Long memberId = valueOperations.get(refreshToken);
 
@@ -37,5 +40,9 @@ public class RefreshTokenRepository {
         }
 
         return Optional.of(refreshToken);
+    }
+
+    public Optional<String> findById(Long userId) {
+        return Optional.ofNullable("");
     }
 }
