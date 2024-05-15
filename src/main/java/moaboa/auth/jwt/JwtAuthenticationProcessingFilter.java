@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import moaboa.auth.refresh.RefreshTokenRepository;
 import moaboa.auth.user.User;
 import moaboa.auth.user.UserRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,6 +30,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
     @Override
@@ -65,28 +67,27 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
      *  [리프레시 토큰으로 유저 정보 찾기 & 액세스 토큰/리프레시 토큰 재발급 메소드]
      *  파라미터로 들어온 헤더에서 추출한 리프레시 토큰으로 DB에서 유저를 찾고, 해당 유저가 있다면
      *  jwtUtil.createAccessToken()으로 AccessToken 생성,
-     *  reIssueRefreshToken()로 리프레시 토큰 재발급 & DB에 리프레시 토큰 업데이트 메소드 호출
+     *  reIssueRefreshToken()로 기존 리프레시 토큰 삽입 or 생성
      *  그 후 jwtUtil.sendAccessTokenAndRefreshToken()으로 응답 헤더에 보내기
      */
     public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
-//        refreshTokenRepository.findById(refreshToken)
-//                .ifPresent(user -> {
-//
-//                });
-//        userRepository.findByRefreshToken(refreshToken)
-//                .ifPresent(user -> {
-//                    String reIssuedRefreshToken = reIssueRefreshToken(user);
-//                    jwtUtil.sendAccessAndRefreshToken(response, jwtUtil.createAccessToken(user.getEmail()),
-//                            reIssuedRefreshToken);
-//                });
+        refreshTokenRepository.findMemberIdByToken(refreshToken)
+                .ifPresent(memberId -> {
+                    String reIssuedRefreshToken = reIssueRefreshToken(memberId);
+                    jwtUtil.sendAccessAndRefreshToken(
+                            response,
+                            jwtUtil.createAccessToken(memberId),
+                            reIssuedRefreshToken
+                    );
+                });
     }
 
     /**
      * [리프레시 토큰 재발급 & DB에 리프레시 토큰 업데이트 메소드]
      * jwtUtil.createRefreshToken()으로 리프레시 토큰 재발급 후 리턴
      */
-    private String reIssueRefreshToken(User user) {
-        return jwtUtil.getRefreshToken(user.getId());
+    private String reIssueRefreshToken(Long memberId) {
+        return jwtUtil.getRefreshToken(memberId);
     }
 
     public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,

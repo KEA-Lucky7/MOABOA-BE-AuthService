@@ -6,9 +6,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Repository;
 
-import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -31,18 +29,18 @@ public class RefreshTokenRepository {
 
     }
 
-    public Optional<String> findByToken(final String refreshToken) {
+    public Optional<Long> findMemberIdByToken(final String refreshToken) {
         ValueOperations<String, Long> valueOperations = redisTemplate.opsForValue();
-        Long memberId = valueOperations.get(refreshToken);
-
-        if (Objects.isNull(memberId)) {
-            return Optional.empty();
-        }
-
-        return Optional.of(refreshToken);
+        return Optional.ofNullable(valueOperations.get(refreshToken));
     }
 
-    public Optional<String> findById(Long userId) {
+    public Optional<String> findById(final Long userId) {
+        ValueOperations<String, Long> valueOperations = redisTemplate.opsForValue();
+//        Long memberId = valueOperations.get(refreshToken);
+
+//        if (Objects.isNull(memberId)) {
+//            return Optional.empty();
+//        }
         return Optional.ofNullable("");
     }
 }
