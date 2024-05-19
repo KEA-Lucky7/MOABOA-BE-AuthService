@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import moaboa.auth.jwt.JwtUtil;
+import moaboa.auth.token.jwt.JwtUtil;
 import moaboa.auth.oauth2.userinfo.CustomOAuth2User;
 import moaboa.auth.user.Role;
 import moaboa.auth.user.User;

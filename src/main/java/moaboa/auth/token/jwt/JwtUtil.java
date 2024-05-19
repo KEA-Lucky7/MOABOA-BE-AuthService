@@ -1,4 +1,4 @@
-package moaboa.auth.jwt;
+package moaboa.auth.token.jwt;
 
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import moaboa.auth.refresh.RefreshTokenRepository;
+import moaboa.auth.token.refresh.RefreshTokenRepository;
 import moaboa.auth.user.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

@@ -2,13 +2,13 @@ package moaboa.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import moaboa.auth.jwt.JwtAuthenticationEntryPoint;
-import moaboa.auth.jwt.JwtAuthenticationProcessingFilter;
-import moaboa.auth.jwt.JwtUtil;
+import moaboa.auth.token.jwt.JwtAuthenticationEntryPoint;
+import moaboa.auth.token.jwt.JwtAuthenticationProcessingFilter;
+import moaboa.auth.token.jwt.JwtUtil;
 import moaboa.auth.oauth2.CustomOAuth2UserService;
 import moaboa.auth.oauth2.handler.OAuth2LoginFailureHandler;
 import moaboa.auth.oauth2.handler.OAuth2LoginSuccessHandler;
-import moaboa.auth.refresh.RefreshTokenRepository;
+import moaboa.auth.token.refresh.RefreshTokenRepository;
 import moaboa.auth.response.ErrorCode;
 import moaboa.auth.response.ErrorResponse;
 import moaboa.auth.user.Role;

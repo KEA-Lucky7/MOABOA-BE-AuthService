@@ -1,4 +1,4 @@
-package moaboa.auth.refresh;
+package moaboa.auth.token.refresh;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

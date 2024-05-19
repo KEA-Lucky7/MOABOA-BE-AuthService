@@ -1,4 +1,4 @@
-package moaboa.auth.jwt;
+package moaboa.auth.token.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
