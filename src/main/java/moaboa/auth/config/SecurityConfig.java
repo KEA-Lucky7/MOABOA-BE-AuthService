@@ -8,6 +8,7 @@ import moaboa.auth.jwt.JwtUtil;
 import moaboa.auth.oauth2.CustomOAuth2UserService;
 import moaboa.auth.oauth2.handler.OAuth2LoginFailureHandler;
 import moaboa.auth.oauth2.handler.OAuth2LoginSuccessHandler;
+import moaboa.auth.refresh.RefreshTokenRepository;
 import moaboa.auth.response.ErrorCode;
 import moaboa.auth.response.ErrorResponse;
 import moaboa.auth.user.Role;
@@ -38,6 +39,7 @@ public class SecurityConfig {
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final JwtUtil jwtUtil;
 
 
@@ -75,7 +77,8 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .addFilterBefore(new JwtAuthenticationProcessingFilter(jwtUtil, jwtUtil.getUserRepository()), UsernamePasswordAuthenticationFilter.class
+                .addFilterBefore(new JwtAuthenticationProcessingFilter(jwtUtil, jwtUtil.getUserRepository(), refreshTokenRepository),
+                        UsernamePasswordAuthenticationFilter.class
                 )
                 .exceptionHandling(authenticationManager -> authenticationManager
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
