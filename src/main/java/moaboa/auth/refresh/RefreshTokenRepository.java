@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 @Repository
 public class RefreshTokenRepository {
 
-    @Value("${jwt.secret.expiration}")
+    @Value("${jwt.refresh.expiration}")
     private Long refreshExpirePeriod;
     private RedisTemplate redisTemplate;
 
