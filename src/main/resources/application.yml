@@ -17,7 +17,7 @@ spring:
         web-allow-others: true
   data:
     redis:
-      host: localhost
+      host: redis-database
       port: 6379
   application:
     name: auth-service
