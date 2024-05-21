@@ -1,4 +1,4 @@
-package moaboa.auth.jwt;
+package moaboa.auth.token.jwt;
 
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -6,7 +6,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import moaboa.auth.refresh.RefreshTokenRepository;
+import moaboa.auth.error.ErrorCode;
+import moaboa.auth.error.TokenException;
+import moaboa.auth.token.refresh.RefreshTokenRepository;
 import moaboa.auth.user.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -154,7 +156,7 @@ public class JwtUtil {
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             log.error("유효하지 않은 액세스 토큰입니다. {}", e.getMessage());
-            return false;
+            throw new TokenException(ErrorCode.EXPIRED_ACCESS_TOKEN);
         }
     }
 }
