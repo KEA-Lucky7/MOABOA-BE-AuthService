@@ -46,7 +46,6 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw e;
         }
     }
 
@@ -58,7 +57,6 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         response.addHeader(jwtUtil.getRefreshHeader(), "Bearer " + refreshToken);
 
         jwtUtil.sendAccessAndRefreshToken(response, accessToken, refreshToken);
-//        jwtUtil.updateRefreshToken(user.getId(), refreshToken);
     }
 
 }

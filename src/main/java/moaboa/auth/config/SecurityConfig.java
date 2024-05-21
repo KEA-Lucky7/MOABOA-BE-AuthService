@@ -2,6 +2,7 @@ package moaboa.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import moaboa.auth.error.filter.ExceptionFilter;
 import moaboa.auth.token.jwt.JwtAuthenticationEntryPoint;
 import moaboa.auth.token.jwt.JwtAuthenticationProcessingFilter;
 import moaboa.auth.token.jwt.JwtUtil;
@@ -9,7 +10,7 @@ import moaboa.auth.oauth2.CustomOAuth2UserService;
 import moaboa.auth.oauth2.handler.OAuth2LoginFailureHandler;
 import moaboa.auth.oauth2.handler.OAuth2LoginSuccessHandler;
 import moaboa.auth.token.refresh.RefreshTokenRepository;
-import moaboa.auth.response.ErrorCode;
+import moaboa.auth.error.ErrorCode;
 import moaboa.auth.response.ErrorResponse;
 import moaboa.auth.user.Role;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -53,9 +54,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
-                                new AntPathRequestMatcher("/auth/**")
-                        ).authenticated()
-                        .requestMatchers(
+                                new AntPathRequestMatcher("/auth/token/validation"),
                                 new AntPathRequestMatcher("/"),
                                 new AntPathRequestMatcher("/index.html"),
                                 new AntPathRequestMatcher("/h2-console/**"),
@@ -67,6 +66,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 new AntPathRequestMatcher("/api/members/createUser")
                         ).hasRole(Role.GUEST.name())
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/auth/**")
+                        ).authenticated()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
@@ -80,6 +82,7 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtAuthenticationProcessingFilter(jwtUtil, jwtUtil.getUserRepository(), refreshTokenRepository),
                         UsernamePasswordAuthenticationFilter.class
                 )
+                .addFilterBefore(exceptionFilter(), JwtAuthenticationProcessingFilter.class)
                 .exceptionHandling(authenticationManager -> authenticationManager
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                         .accessDeniedHandler(accessDeniedHandler()))
@@ -114,6 +117,11 @@ public class SecurityConfig {
             response.setContentType("application/json;charset=UTF-8");
             response.getWriter().write(new ObjectMapper().writeValueAsString(responseBody));
         };
+    }
+
+    @Bean
+    public ExceptionFilter exceptionFilter() {
+        return new ExceptionFilter();
     }
 
 

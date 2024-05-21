@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import moaboa.auth.error.ErrorCode;
+import moaboa.auth.error.TokenException;
 import moaboa.auth.token.refresh.RefreshTokenRepository;
 import moaboa.auth.user.User;
 import moaboa.auth.user.UserRepository;
@@ -71,14 +73,9 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
      *  그 후 jwtUtil.sendAccessTokenAndRefreshToken()으로 응답 헤더에 보내기
      */
     public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
-        refreshTokenRepository.findMemberIdByToken(refreshToken)
-                .ifPresent(memberId ->
-                        jwtUtil.sendAccessAndRefreshToken(
-                                response,
-                                jwtUtil.reIssueAccessToken(memberId),
-                                jwtUtil.getRefreshToken(memberId)
-                        )
-                );
+        Long memberId = refreshTokenRepository.findMemberIdByToken(refreshToken)
+                .orElseThrow(() -> new TokenException(ErrorCode.EXPIRED_REFRESH_TOKEN));
+        jwtUtil.sendAccessAndRefreshToken(response, jwtUtil.reIssueAccessToken(memberId), jwtUtil.getRefreshToken(memberId));
     }
 
     public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
@@ -88,7 +85,6 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                 .filter(jwtUtil::isAccessTokenValid)
                 .flatMap(accessToken -> jwtUtil.extractId(accessToken)
                         .flatMap(id -> userRepository.findById(Long.parseLong(id))));
-        log.info("user: {}, isEmpty: {}", user, user.isEmpty());
                 user.ifPresent(this::saveAuthentication);
 
         filterChain.doFilter(request, response);
