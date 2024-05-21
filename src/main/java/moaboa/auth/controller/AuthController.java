@@ -1,4 +1,4 @@
-package moaboa.auth.token.controller;
+package moaboa.auth.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/auth/token")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
-public class TokenController {
+public class AuthController {
 
-    @PostMapping("/validation")
+    @PostMapping("/token/validation")
     public ResponseEntity<HttpStatus> validateToken() {
         return ResponseEntity.ok().build();
     }
