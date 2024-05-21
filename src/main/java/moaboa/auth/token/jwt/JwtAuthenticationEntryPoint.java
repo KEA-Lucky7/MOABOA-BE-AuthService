@@ -1,11 +1,10 @@
 package moaboa.auth.token.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import moaboa.auth.error.ErrorCode;
-import moaboa.auth.response.ErrorResponse;
+import moaboa.auth.global.error.ErrorCode;
+import moaboa.auth.global.response.ErrorResponse;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

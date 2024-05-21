@@ -1,14 +1,8 @@
-package moaboa.auth.error;
+package moaboa.auth.global.error;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import moaboa.auth.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-
-import java.io.IOException;
 
 @Getter
 @RequiredArgsConstructor

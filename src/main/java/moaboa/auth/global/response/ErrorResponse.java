@@ -1,4 +1,4 @@
-package moaboa.auth.response;
+package moaboa.auth.global.response;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
