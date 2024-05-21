@@ -17,8 +17,8 @@ spring:
         web-allow-others: true
   data:
     redis:
-      host: #
-      port: #
+      host: redis-database
+      port: 6379
   application:
     name: auth-service
 #  cloud:
@@ -61,8 +61,8 @@ server:
 jwt:
   secret: ${JWT_SECRET_KEY}
   access:
-    header: access-token
+    header: Authorization
     expiration: 7200000 #2시간
   refresh:
-    header: refresh-token
+    header: Refresh-Token
     expiration: 2678400000 #31일

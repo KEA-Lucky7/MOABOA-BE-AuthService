@@ -1,10 +1,10 @@
-package moaboa.auth.jwt;
+package moaboa.auth.token.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import moaboa.auth.response.ErrorCode;
+import moaboa.auth.error.ErrorCode;
 import moaboa.auth.response.ErrorResponse;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
@@ -16,7 +16,7 @@ import java.io.IOException;
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException, IOException {
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
         ErrorResponse errorResponse = new ErrorResponse(ErrorCode.UNAUTHORIZED_CLIENT.getCode(), ErrorCode.UNAUTHORIZED_CLIENT.getMessage());
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonErrorResponse = objectMapper.writeValueAsString(errorResponse);
@@ -26,5 +26,4 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE); // application/json
         response.getWriter().write(jsonErrorResponse);
     }
-
 }

@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import moaboa.auth.jwt.JwtUtil;
+import moaboa.auth.token.jwt.JwtUtil;
 import moaboa.auth.oauth2.userinfo.CustomOAuth2User;
 import moaboa.auth.user.Role;
 import moaboa.auth.user.User;
@@ -46,7 +46,6 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw e;
         }
     }
 
@@ -58,7 +57,6 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         response.addHeader(jwtUtil.getRefreshHeader(), "Bearer " + refreshToken);
 
         jwtUtil.sendAccessAndRefreshToken(response, accessToken, refreshToken);
-//        jwtUtil.updateRefreshToken(user.getId(), refreshToken);
     }
 
 }

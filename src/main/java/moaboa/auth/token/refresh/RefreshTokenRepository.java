@@ -1,4 +1,4 @@
-package moaboa.auth.refresh;
+package moaboa.auth.token.refresh;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 @Repository
 public class RefreshTokenRepository {
 
-    @Value("${jwt.secret.expiration}")
+    @Value("${jwt.refresh.expiration}")
     private Long refreshExpirePeriod;
     private RedisTemplate redisTemplate;
 
@@ -21,12 +21,11 @@ public class RefreshTokenRepository {
         this.redisTemplate = redisTemplate;
     }
 
-    public void save(String refreshToken, Long memberId) {
+    public void save(final String refreshToken, final Long memberId) {
         ValueOperations<String, Long> valueOperations = redisTemplate.opsForValue();
+        log.info("refresh Token 저장");
         valueOperations.set(refreshToken, memberId);
         redisTemplate.expire(refreshToken, refreshExpirePeriod, TimeUnit.SECONDS);
-        log.info("refresh Token 저장");
-
     }
 
     public Optional<Long> findMemberIdByToken(final String refreshToken) {
