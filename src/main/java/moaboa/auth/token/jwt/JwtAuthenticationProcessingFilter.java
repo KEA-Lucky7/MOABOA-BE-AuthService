@@ -6,8 +6,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import moaboa.auth.error.ErrorCode;
-import moaboa.auth.error.TokenException;
+import moaboa.auth.global.error.ErrorCode;
+import moaboa.auth.global.error.TokenException;
 import moaboa.auth.token.refresh.RefreshTokenRepository;
 import moaboa.auth.user.User;
 import moaboa.auth.user.UserRepository;
@@ -18,6 +18,7 @@ import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -28,7 +29,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
-    private static final String NO_CHECK_URL = "/login/**";
+    private static final String[] NO_CHECK_URL = {"/login/**", "/auth/health"};
+    private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
@@ -37,9 +39,12 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-            if (request.getRequestURI().equals(NO_CHECK_URL)) {
+        String requestURI = request.getRequestURI();
+        for (String pattern : NO_CHECK_URL) {
+            if (pathMatcher.match(pattern, requestURI)) {
                 filterChain.doFilter(request, response);
-                return; //  이후 현재 필터 진행 막기
+                return; // 이후 현재 필터 진행 막기
+            }
         }
 
         // 사용자 요청 헤더에서 RefreshToken 추출

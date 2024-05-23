@@ -1,13 +1,13 @@
-package moaboa.auth.error.filter;
+package moaboa.auth.global.error.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import moaboa.auth.error.ErrorCode;
-import moaboa.auth.error.TokenException;
-import moaboa.auth.response.ErrorResponse;
+import moaboa.auth.global.error.ErrorCode;
+import moaboa.auth.global.error.TokenException;
+import moaboa.auth.global.response.ErrorResponse;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;

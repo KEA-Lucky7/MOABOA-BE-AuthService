@@ -1,8 +1,8 @@
-package moaboa.auth.config;
+package moaboa.auth.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import moaboa.auth.error.filter.ExceptionFilter;
+import moaboa.auth.global.error.filter.ExceptionFilter;
 import moaboa.auth.token.jwt.JwtAuthenticationEntryPoint;
 import moaboa.auth.token.jwt.JwtAuthenticationProcessingFilter;
 import moaboa.auth.token.jwt.JwtUtil;
@@ -10,8 +10,8 @@ import moaboa.auth.oauth2.CustomOAuth2UserService;
 import moaboa.auth.oauth2.handler.OAuth2LoginFailureHandler;
 import moaboa.auth.oauth2.handler.OAuth2LoginSuccessHandler;
 import moaboa.auth.token.refresh.RefreshTokenRepository;
-import moaboa.auth.error.ErrorCode;
-import moaboa.auth.response.ErrorResponse;
+import moaboa.auth.global.error.ErrorCode;
+import moaboa.auth.global.response.ErrorResponse;
 import moaboa.auth.user.Role;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -55,6 +55,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
                                 new AntPathRequestMatcher("/auth/token/validation"),
+                                new AntPathRequestMatcher("/auth/health"),
                                 new AntPathRequestMatcher("/"),
                                 new AntPathRequestMatcher("/index.html"),
                                 new AntPathRequestMatcher("/h2-console/**"),

@@ -1,4 +1,4 @@
-package moaboa.auth.error;
+package moaboa.auth.global.error;
 
 import lombok.Getter;
 
