@@ -26,4 +26,9 @@ public class AuthServiceImpl implements AuthService{
                         .orElseThrow(() -> new TokenException(ErrorCode.BAD_REQUEST))
         );
     }
+
+    @Override
+    public void giveTemporaryToken(Long id, HttpServletResponse response) {
+        jwtUtil.setAccessTokenHeader(response, jwtUtil.createAccessToken(id));
+    }
 }

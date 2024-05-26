@@ -6,4 +6,6 @@ import jakarta.servlet.http.HttpServletResponse;
 public interface AuthService {
 
     void validateToken(HttpServletRequest request, HttpServletResponse response);
+
+    void giveTemporaryToken(Long id, HttpServletResponse response);
 }

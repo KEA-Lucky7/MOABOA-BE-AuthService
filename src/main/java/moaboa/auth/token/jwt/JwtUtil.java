@@ -51,7 +51,7 @@ public class JwtUtil {
         Date now = new Date();
         return Jwts.builder()
                 .setHeaderParam("type", "jwt")
-                .claim("id", id)
+                .claim("id", id.toString())
                 .subject(ACCESS_TOKEN_SUBJECT)
                 .issuedAt(now)
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpirationPeriod))
@@ -126,6 +126,7 @@ public class JwtUtil {
                     .get("id", String.class));
         } catch (Exception e) {
             log.error("액세스 토큰이 유효하지 않습니다.");
+            e.printStackTrace();
             return Optional.empty();
         }
     }
