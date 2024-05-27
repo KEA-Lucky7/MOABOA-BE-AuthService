@@ -9,8 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import moaboa.auth.global.error.ErrorCode;
 import moaboa.auth.global.error.TokenException;
 import moaboa.auth.token.refresh.RefreshTokenRepository;
-import moaboa.auth.user.User;
-import moaboa.auth.user.UserRepository;
+import moaboa.auth.member.Member;
+import moaboa.auth.member.repository.query.MemberQueryRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
@@ -29,11 +29,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
-    private static final String[] NO_CHECK_URL = {"/login/**", "/auth/health"};
+    private static final String[] NO_CHECK_URL = {"/login/**", "/auth/health", "/auth/token"};
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     private final JwtUtil jwtUtil;
-    private final UserRepository userRepository;
+    private final MemberQueryRepository memberQueryRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
@@ -86,18 +86,18 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
                                                   FilterChain filterChain) throws ServletException, IOException {
         log.info("checkAccessTokenAndAuthentication() 호출");
-        Optional<User> user = jwtUtil.extractAccessToken(request)
+        Optional<Member> user = jwtUtil.extractAccessToken(request)
                 .filter(jwtUtil::isAccessTokenValid)
                 .flatMap(accessToken -> jwtUtil.extractId(accessToken)
-                        .flatMap(id -> userRepository.findById(Long.parseLong(id))));
+                        .flatMap(id -> memberQueryRepository.findById(Long.parseLong(id))));
                 user.ifPresent(this::saveAuthentication);
 
         filterChain.doFilter(request, response);
     }
 
-    public void saveAuthentication(User user) {
+    public void saveAuthentication(Member member) {
         UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
-                .roles(user.getRole().name())
+                .roles(member.getRole().name())
                 .build();
 
         Authentication authentication =

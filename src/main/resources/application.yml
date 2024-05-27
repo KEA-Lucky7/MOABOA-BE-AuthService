@@ -1,33 +1,22 @@
 logging:
   level:
-#    org.apache.zookeeper.ClientCnxn: WARN
+    #    org.apache.zookeeper.ClientCnxn: WARN
     org.springframework.security: trace
 
 spring:
-  datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:test
-    username: sa
-    password:
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-      settings:
-        web-allow-others: true
   data:
     redis:
       host: redis-database
       port: 6379
   application:
     name: auth-service
-#  cloud:
-#    zookeeper:
-#      connect-string: localhost:2181
-#      discovery:
-#        enabled: true
-#        root: /services
-#        instance-id: ${spring.application.name}:${server.port}}
+  #  cloud:
+  #    zookeeper:
+  #      connect-string: localhost:2181
+  #      discovery:
+  #        enabled: true
+  #        root: /services
+  #        instance-id: ${spring.application.name}:${server.port}}
   security:
     oauth2:
       client:
@@ -47,7 +36,7 @@ spring:
             client-name: Kakao
             scope:
               - profile_nickname
-#              - account_email
+        #              - account_email
         provider:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize
