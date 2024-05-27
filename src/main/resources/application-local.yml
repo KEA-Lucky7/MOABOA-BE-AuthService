@@ -4,19 +4,19 @@ spring:
       on-profile: local
   datasource:
     # Command DB
-    driver-class-name: org.h2.Driver
     hikari:
       jdbc-url: jdbc:h2:mem:test
-    username: sa
-    password:
+      username: sa
+      password:
+      driver-class-name: org.h2.Driver
 
   # Query DB
   query-datasource:
-    driver-class-name: org.h2.Driver
     hikari:
       jdbc-url: jdbc:h2:mem:test
-    username: sa
-    password:
+      username: sa
+      password:
+      driver-class-name: org.h2.Driver
 
   jpa:
     properties:

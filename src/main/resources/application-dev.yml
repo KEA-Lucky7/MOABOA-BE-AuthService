@@ -4,19 +4,20 @@ spring:
       on-profile: dev
   datasource:
     # Command DB
-    driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       jdbc-url: jdbc:mysql://${COMMAND-DB-ADDRESS}:3306/member
-    username: ${COMMAND-DB-HOST}
-    password: ${COMMAND-DB-PASSWORD}
+      username: ${COMMAND-DB-HOST}
+      password: ${COMMAND-DB-PASSWORD}
+      driver-class-name: com.mysql.cj.jdbc.Driver
 
   # Query DB
   query-datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       jdbc-url: jdbc:mysql://${QUERY-DB-ADDRESS}:3306/moaboa
-    username: ${QUERY-DB-HOST}
-    password: ${QUERY-DB-PASSWORD}
+      username: ${QUERY-DB-HOST}
+      password: ${QUERY-DB-PASSWORD}
+      driver-class-name: com.mysql.cj.jdbc.Driver
+
 
   jpa:
     properties:

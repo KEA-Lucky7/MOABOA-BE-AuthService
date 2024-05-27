@@ -1,5 +1,6 @@
 package moaboa.auth.global.config.datasource;
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -47,7 +48,9 @@ public class CommandDataSourceConfiguration {
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource.hikari")
     public DataSource commandDataSource() {
-        return DataSourceBuilder.create().build();
+        return DataSourceBuilder.create()
+                .type(HikariDataSource.class)
+                .build();
     }
 
 }
