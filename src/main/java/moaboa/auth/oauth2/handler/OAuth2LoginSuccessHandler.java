@@ -5,11 +5,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import moaboa.auth.global.error.ErrorCode;
+import moaboa.auth.global.error.TokenException;
 import moaboa.auth.token.jwt.JwtUtil;
 import moaboa.auth.oauth2.userinfo.CustomOAuth2User;
-import moaboa.auth.user.Role;
-import moaboa.auth.user.User;
-import moaboa.auth.user.UserRepository;
+import moaboa.auth.member.Role;
+import moaboa.auth.member.Member;
+import moaboa.auth.member.repository.query.MemberQueryRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -22,37 +24,37 @@ import java.io.IOException;
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtUtil jwtUtil;
-    private final UserRepository userRepository;
+    private final MemberQueryRepository memberQueryRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("OAuth2 Login 성공!");
         try {
             CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
-            User user = userRepository.findBySocialId(oAuth2User.getId())
-                    .orElseThrow(RuntimeException::new);
+            Member member = memberQueryRepository.findBySocialId(oAuth2User.getId())
+                    .orElseThrow(() -> new TokenException(ErrorCode.NOT_EXIST_USER));
 
             // 처음 요청한 회원
-            if (user.getRole() == Role.GUEST) {
-                String accessToken = jwtUtil.createAccessToken(user.getId());
-                String refreshToken = jwtUtil.getRefreshToken(user.getId());
+            if (member.getRole() == Role.GUEST) {
+                String accessToken = jwtUtil.createAccessToken(member.getId());
+                String refreshToken = jwtUtil.getRefreshToken(member.getId());
 
                 jwtUtil.sendAccessAndRefreshToken(response, accessToken, refreshToken);
-                log.info("임시 회원가입 성공");
+
                 // 프런트에 회원가입 페이지 리다이렉션
-                response.sendRedirect("http://localhost:5173");
+                response.sendRedirect("http://localhost:5173/login/redirect");
             } else {
-                loginSuccess(response, user); // 로그인에 성공한 경우 access, refresh 토큰 생성
+                loginSuccess(response, member); // 로그인에 성공한 경우 access, refresh 토큰 생성
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void loginSuccess(HttpServletResponse response, User user) throws IOException {
+    private void loginSuccess(HttpServletResponse response, Member member) throws IOException {
         log.info("로그인 성공!");
-        String accessToken = jwtUtil.createAccessToken(user.getId());
-        String refreshToken = jwtUtil.getRefreshToken(user.getId());
+        String accessToken = jwtUtil.createAccessToken(member.getId());
+        String refreshToken = jwtUtil.getRefreshToken(member.getId());
         response.addHeader(jwtUtil.getAccessHeader(), "Bearer " + accessToken);
         response.addHeader(jwtUtil.getRefreshHeader(), "Bearer " + refreshToken);
 

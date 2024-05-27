@@ -8,8 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import moaboa.auth.global.error.ErrorCode;
 import moaboa.auth.global.error.TokenException;
+import moaboa.auth.member.repository.query.MemberQueryRepository;
 import moaboa.auth.token.refresh.RefreshTokenRepository;
-import moaboa.auth.user.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -43,7 +43,7 @@ public class JwtUtil {
     private static final String EMAIL_CLAIM = "email";
     private static final String BEARER = "Bearer ";
 
-    private final UserRepository userRepository;
+    private final MemberQueryRepository memberQueryRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 
 
@@ -51,7 +51,7 @@ public class JwtUtil {
         Date now = new Date();
         return Jwts.builder()
                 .setHeaderParam("type", "jwt")
-                .claim("id", id)
+                .claim("id", id.toString())
                 .subject(ACCESS_TOKEN_SUBJECT)
                 .issuedAt(now)
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpirationPeriod))
@@ -74,7 +74,7 @@ public class JwtUtil {
     }
 
     public String getRefreshToken(Long id) {
-        Long userId = userRepository.findById(id)
+        Long userId = memberQueryRepository.findById(id)
                 .orElseThrow(RuntimeException::new)
                 .getId();
 
@@ -126,6 +126,7 @@ public class JwtUtil {
                     .get("id", String.class));
         } catch (Exception e) {
             log.error("액세스 토큰이 유효하지 않습니다.");
+            e.printStackTrace();
             return Optional.empty();
         }
     }
