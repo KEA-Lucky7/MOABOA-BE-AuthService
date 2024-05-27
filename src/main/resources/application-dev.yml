@@ -12,8 +12,7 @@ spring:
   # Query DB
   query-datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      jdbc-url: jdbc:mysql://${QUERY-DB-ADDRESS}:3306/moaboa
+    jdbc-url: jdbc:mysql://${QUERY-DB-ADDRESS}:3306/moaboa
     username: ${QUERY-DB-HOST}
     password: ${QUERY-DB-PASSWORD}
 
