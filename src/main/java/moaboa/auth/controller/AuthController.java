@@ -15,7 +15,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/token/validation")
+    @GetMapping("/token/validation")
     public ResponseEntity<HttpStatus> validateToken(HttpServletRequest request, HttpServletResponse response) {
         authService.validateToken(request, response);
         return ResponseEntity.ok().build();
