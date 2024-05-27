@@ -18,25 +18,25 @@ import javax.sql.DataSource;
 @EnableTransactionManagement
 @EnableJpaRepositories(
         basePackages = "moaboa.auth.member.repository.command",
-        entityManagerFactoryRef = "queryEntityManager",
-        transactionManagerRef = "queryTransactionManager"
+        entityManagerFactoryRef = "commandEntityManager",
+        transactionManagerRef = "commandTransactionManager"
 )
 public class CommandDataSourceConfiguration {
 
     @Primary
     @Bean
-    public PlatformTransactionManager queryTransactionManager() {
+    public PlatformTransactionManager commandTransactionManager() {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(queryEntityManager().getObject());
+        transactionManager.setEntityManagerFactory(commandEntityManager().getObject());
 
         return transactionManager;
     }
 
     @Primary
     @Bean
-    public LocalContainerEntityManagerFactoryBean queryEntityManager() {
+    public LocalContainerEntityManagerFactoryBean commandEntityManager() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(queryDataSource());
+        em.setDataSource(commandDataSource());
         em.setPackagesToScan("moaboa.auth.member");
         em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
@@ -45,8 +45,8 @@ public class CommandDataSourceConfiguration {
 
     @Primary
     @Bean
-    @ConfigurationProperties(prefix = "spring.datasource-query.hikari")
-    public DataSource queryDataSource() {
+    @ConfigurationProperties(prefix = "spring.datasource.hikari")
+    public DataSource commandDataSource() {
         return DataSourceBuilder.create().build();
     }
 

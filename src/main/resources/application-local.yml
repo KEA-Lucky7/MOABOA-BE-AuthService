@@ -3,10 +3,25 @@ spring:
     activate:
       on-profile: local
   datasource:
+    # Command DB
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:test
+    hikari:
+      jdbc-url: jdbc:h2:mem:test
     username: sa
     password:
+
+  # Query DB
+  query-datasource:
+    driver-class-name: org.h2.Driver
+    hikari:
+      jdbc-url: jdbc:h2:mem:test
+    username: sa
+    password:
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
   h2:
     console:
       enabled: true

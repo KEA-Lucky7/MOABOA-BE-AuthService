@@ -41,7 +41,7 @@ public class QueryDataSourceConfiguration {
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "spring.datasource-second.hikari")
+    @ConfigurationProperties(prefix = "spring.query-datasource.hikari")
     public DataSource queryDataSource() {
         return DataSourceBuilder.create().build();
     }
