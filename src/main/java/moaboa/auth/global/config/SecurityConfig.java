@@ -12,7 +12,7 @@ import moaboa.auth.oauth2.handler.OAuth2LoginSuccessHandler;
 import moaboa.auth.token.refresh.RefreshTokenRepository;
 import moaboa.auth.global.error.ErrorCode;
 import moaboa.auth.global.response.ErrorResponse;
-import moaboa.auth.user.Role;
+import moaboa.auth.member.Role;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -81,7 +81,7 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .addFilterBefore(new JwtAuthenticationProcessingFilter(jwtUtil, jwtUtil.getUserRepository(), refreshTokenRepository),
+                .addFilterBefore(new JwtAuthenticationProcessingFilter(jwtUtil, jwtUtil.getMemberRepository(), refreshTokenRepository),
                         UsernamePasswordAuthenticationFilter.class
                 )
                 .addFilterBefore(exceptionFilter(), JwtAuthenticationProcessingFilter.class)

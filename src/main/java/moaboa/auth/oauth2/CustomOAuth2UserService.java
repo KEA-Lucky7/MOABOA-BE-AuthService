@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import moaboa.auth.oauth2.userinfo.CustomOAuth2User;
 import moaboa.auth.oauth2.userinfo.OAuthAttributes;
-import moaboa.auth.user.User;
-import moaboa.auth.user.UserRepository;
+import moaboa.auth.member.Member;
+import moaboa.auth.member.MemberRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -25,7 +25,7 @@ import static moaboa.auth.oauth2.SocialType.KAKAO;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -47,14 +47,14 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         // socialType에 따라 유저 정보를 통해 OAuthAttributes 객체 생성
         OAuthAttributes extractAttributes = OAuthAttributes.of(socialType, userNameAttributeName, attributes);
-        User createdUser = findUser(socialType, extractAttributes);
+        Member createdMember = findUser(socialType, extractAttributes);
 
         return new CustomOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("GUEST")),
                 attributes,
                 extractAttributes.getNameAttributeKey(),
-                createdUser.getSocialId(),
-                createdUser.getSocialType()
+                createdMember.getSocialId(),
+                createdMember.getSocialType()
         );
     }
 
@@ -68,13 +68,13 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         return SocialType.GOOGLE;
     }
 
-    private User findUser(SocialType socialType, OAuthAttributes attributes) {
-        Optional<User> optionalUser = userRepository.findBySocialTypeAndSocialId(socialType, attributes.getOauth2UserInfo().getId());
+    private Member findUser(SocialType socialType, OAuthAttributes attributes) {
+        Optional<Member> optionalUser = memberRepository.findBySocialTypeAndSocialId(socialType, attributes.getOauth2UserInfo().getId());
         return optionalUser.orElseGet(() -> saveUser(socialType, attributes));
     }
 
-    private User saveUser(SocialType socialType, OAuthAttributes attributes) {
+    private Member saveUser(SocialType socialType, OAuthAttributes attributes) {
         log.info("게스트 생성");
-        return userRepository.save(attributes.toEntity(socialType, attributes.getOauth2UserInfo()));
+        return memberRepository.save(attributes.toEntity(socialType, attributes.getOauth2UserInfo()));
     }
 }

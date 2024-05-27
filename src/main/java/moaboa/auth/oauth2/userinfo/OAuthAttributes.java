@@ -3,8 +3,8 @@ package moaboa.auth.oauth2.userinfo;
 import lombok.Builder;
 import lombok.Getter;
 import moaboa.auth.oauth2.SocialType;
-import moaboa.auth.user.Role;
-import moaboa.auth.user.User;
+import moaboa.auth.member.Role;
+import moaboa.auth.member.Member;
 
 import java.util.Map;
 
@@ -63,8 +63,8 @@ public class OAuthAttributes {
      * of메소드로 OAuthAttributes 객체가 생성되어, 유저 정보들이 담긴 OAuth2UserInfo가 소셜 타입별로 주입된 상태
      * role은 GUEST로 설정
      */
-    public User toEntity(SocialType socialType, OAuth2UserInfo oauth2UserInfo) {
-        return User.builder()
+    public Member toEntity(SocialType socialType, OAuth2UserInfo oauth2UserInfo) {
+        return Member.builder()
                 .role(Role.GUEST)
                 .socialType(socialType)
                 .socialId(oauth2UserInfo.getId())

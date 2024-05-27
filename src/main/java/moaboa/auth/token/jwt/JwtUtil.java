@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import moaboa.auth.global.error.ErrorCode;
 import moaboa.auth.global.error.TokenException;
 import moaboa.auth.token.refresh.RefreshTokenRepository;
-import moaboa.auth.user.UserRepository;
+import moaboa.auth.member.MemberRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -43,7 +43,7 @@ public class JwtUtil {
     private static final String EMAIL_CLAIM = "email";
     private static final String BEARER = "Bearer ";
 
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 
 
@@ -74,7 +74,7 @@ public class JwtUtil {
     }
 
     public String getRefreshToken(Long id) {
-        Long userId = userRepository.findById(id)
+        Long userId = memberRepository.findById(id)
                 .orElseThrow(RuntimeException::new)
                 .getId();
 
