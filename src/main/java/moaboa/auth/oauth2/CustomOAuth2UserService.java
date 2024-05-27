@@ -2,10 +2,11 @@ package moaboa.auth.oauth2;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import moaboa.auth.member.repository.command.MemberCommandRepository;
 import moaboa.auth.oauth2.userinfo.CustomOAuth2User;
 import moaboa.auth.oauth2.userinfo.OAuthAttributes;
 import moaboa.auth.member.Member;
-import moaboa.auth.member.MemberRepository;
+import moaboa.auth.member.repository.query.MemberQueryRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -25,7 +26,8 @@ import static moaboa.auth.oauth2.SocialType.KAKAO;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-    private final MemberRepository memberRepository;
+    private final MemberQueryRepository memberQueryRepository;
+    private final MemberCommandRepository memberCommandRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -69,12 +71,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private Member findUser(SocialType socialType, OAuthAttributes attributes) {
-        Optional<Member> optionalUser = memberRepository.findBySocialTypeAndSocialId(socialType, attributes.getOauth2UserInfo().getId());
+        Optional<Member> optionalUser = memberQueryRepository.findBySocialTypeAndSocialId(socialType, attributes.getOauth2UserInfo().getId());
         return optionalUser.orElseGet(() -> saveUser(socialType, attributes));
     }
 
     private Member saveUser(SocialType socialType, OAuthAttributes attributes) {
         log.info("게스트 생성");
-        return memberRepository.save(attributes.toEntity(socialType, attributes.getOauth2UserInfo()));
+        return memberCommandRepository.save(attributes.toEntity(socialType, attributes.getOauth2UserInfo()));
     }
 }

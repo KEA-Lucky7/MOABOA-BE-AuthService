@@ -3,7 +3,16 @@ spring:
     activate:
       on-profile: dev
   datasource:
+    # Command DB
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${COMMAND-DB-ADDRESS}
+    username: ${COMMAND-DB-HOST}
+    password: ${COMMAND-DB-PASSWORD}
+
+  # Query DB
+  query-datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${QUERY-DB-ADDRESS}
     username: ${QUERY-DB-HOST}
     password: ${QUERY-DB-PASSWORD}
+

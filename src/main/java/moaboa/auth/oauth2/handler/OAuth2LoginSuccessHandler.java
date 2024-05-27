@@ -11,7 +11,7 @@ import moaboa.auth.token.jwt.JwtUtil;
 import moaboa.auth.oauth2.userinfo.CustomOAuth2User;
 import moaboa.auth.member.Role;
 import moaboa.auth.member.Member;
-import moaboa.auth.member.MemberRepository;
+import moaboa.auth.member.repository.query.MemberQueryRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -24,14 +24,14 @@ import java.io.IOException;
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtUtil jwtUtil;
-    private final MemberRepository memberRepository;
+    private final MemberQueryRepository memberQueryRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("OAuth2 Login 성공!");
         try {
             CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
-            Member member = memberRepository.findBySocialId(oAuth2User.getId())
+            Member member = memberQueryRepository.findBySocialId(oAuth2User.getId())
                     .orElseThrow(() -> new TokenException(ErrorCode.NOT_EXIST_USER));
 
             // 처음 요청한 회원
