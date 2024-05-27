@@ -1,9 +1,6 @@
-logging:
-  level:
-    #    org.apache.zookeeper.ClientCnxn: WARN
-    org.springframework.security: trace
-
 spring:
+  profiles:
+    active: ${profile}
   data:
     redis:
       host: redis-database
