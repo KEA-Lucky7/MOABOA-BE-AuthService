@@ -17,14 +17,14 @@ public class AuthServiceImpl implements AuthService{
     private static final String USER_HEADER = "User";
 
     @Override
-    public void validateToken(HttpServletRequest request, HttpServletResponse response) {
+    public Long validateToken(HttpServletRequest request, HttpServletResponse response) {
         String accessToken = jwtUtil.extractAccessToken(request)
                 .orElseThrow(() -> new TokenException(ErrorCode.BAD_REQUEST));
-        response.addHeader(
-                USER_HEADER,
-                jwtUtil.extractId(accessToken)
-                        .orElseThrow(() -> new TokenException(ErrorCode.BAD_REQUEST))
-        );
+        String memberId = jwtUtil.extractId(accessToken)
+                .orElseThrow(() -> new TokenException(ErrorCode.BAD_REQUEST));
+        response.addHeader(USER_HEADER, memberId);
+
+        return Long.parseLong(memberId);
     }
 
     @Override
