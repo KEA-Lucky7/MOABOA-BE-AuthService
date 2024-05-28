@@ -5,13 +5,13 @@ import lombok.*;
 import moaboa.auth.global.BaseEntity;
 import moaboa.auth.global.State;
 import moaboa.auth.oauth2.SocialType;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.time.LocalDate;
 
 @Getter
 @Entity
 @Builder
+@Table(name = "member")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
