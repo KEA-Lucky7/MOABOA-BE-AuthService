@@ -15,10 +15,9 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @GetMapping("/token/validation")
-    public ResponseEntity<HttpStatus> validateToken(HttpServletRequest request, HttpServletResponse response) {
-        authService.validateToken(request, response);
-        return ResponseEntity.ok().build();
+    @PostMapping("/token/validation")
+    public ResponseEntity<Long> validateToken(HttpServletRequest request, HttpServletResponse response) {
+        return ResponseEntity.ok(authService.validateToken(request, response));
     }
 
     @GetMapping("/token")
