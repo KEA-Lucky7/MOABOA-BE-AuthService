@@ -96,7 +96,9 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     }
 
     public void saveAuthentication(Member member) {
-        UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
+        UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder().roles()
+                .username(member.getNickname())
+                .password(member.getId().toString())
                 .roles(member.getRole().name())
                 .build();
 
