@@ -28,7 +28,19 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
+    public Long validateServerToken(HttpServletRequest request) {
+        String accessToken = jwtUtil.extractAccessToken(request)
+                .orElseThrow(() -> new TokenException(ErrorCode.BAD_REQUEST));
+        String memberId = jwtUtil.extractId(accessToken)
+                .orElseThrow(() -> new TokenException(ErrorCode.BAD_REQUEST));
+        return Long.parseLong(memberId);
+//        return new TokenResponse(Long.parseLong(memberId));
+    }
+
+    @Override
     public void giveTemporaryToken(Long id, HttpServletResponse response) {
         jwtUtil.setAccessTokenHeader(response, jwtUtil.createAccessToken(id));
     }
+
+
 }
