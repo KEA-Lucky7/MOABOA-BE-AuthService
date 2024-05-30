@@ -34,7 +34,6 @@ public class AuthServiceImpl implements AuthService{
         String memberId = jwtUtil.extractId(accessToken)
                 .orElseThrow(() -> new TokenException(ErrorCode.BAD_REQUEST));
         return Long.parseLong(memberId);
-//        return new TokenResponse(Long.parseLong(memberId));
     }
 
     @Override
