@@ -20,6 +20,11 @@ public class AuthController {
         return ResponseEntity.ok(authService.validateToken(request, response));
     }
 
+    @PostMapping("/token/server-validation")
+    public ResponseEntity<Long> validateServerToken(HttpServletRequest request) {
+        return ResponseEntity.ok(authService.validateServerToken(request));
+    }
+
     @GetMapping("/token")
     public ResponseEntity<HttpStatus> giveTemporaryToken(@RequestParam Long id, HttpServletResponse response) {
         authService.giveTemporaryToken(id, response);

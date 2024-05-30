@@ -8,4 +8,6 @@ public interface AuthService {
     Long validateToken(HttpServletRequest request, HttpServletResponse response);
 
     void giveTemporaryToken(Long id, HttpServletResponse response);
+
+    Long validateServerToken(HttpServletRequest request);
 }
