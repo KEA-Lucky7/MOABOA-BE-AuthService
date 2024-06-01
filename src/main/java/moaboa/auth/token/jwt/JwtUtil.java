@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import moaboa.auth.global.error.ErrorCode;
 import moaboa.auth.global.error.TokenException;
+import moaboa.auth.member.repository.command.MemberCommandRepository;
 import moaboa.auth.member.repository.query.MemberQueryRepository;
 import moaboa.auth.token.refresh.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,6 +45,7 @@ public class JwtUtil {
     private static final String BEARER = "Bearer ";
 
     private final MemberQueryRepository memberQueryRepository;
+    private final MemberCommandRepository memberCommandRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 
 
@@ -75,7 +77,9 @@ public class JwtUtil {
 
     public String getRefreshToken(Long id) {
         Long userId = memberQueryRepository.findById(id)
-                .orElseThrow(RuntimeException::new)
+                .orElse(memberCommandRepository
+                        .findById(id)
+                        .orElseThrow(() -> new TokenException(ErrorCode.NOT_EXIST_USER)))
                 .getId();
 
         return findRefreshToken(userId);

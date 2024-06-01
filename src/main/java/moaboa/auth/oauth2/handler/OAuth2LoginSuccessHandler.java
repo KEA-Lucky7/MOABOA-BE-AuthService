@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import moaboa.auth.global.error.ErrorCode;
 import moaboa.auth.global.error.TokenException;
+import moaboa.auth.member.repository.command.MemberCommandRepository;
 import moaboa.auth.token.jwt.JwtUtil;
 import moaboa.auth.oauth2.userinfo.CustomOAuth2User;
 import moaboa.auth.member.Role;
@@ -24,14 +25,14 @@ import java.io.IOException;
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtUtil jwtUtil;
-    private final MemberQueryRepository memberQueryRepository;
+    private final MemberCommandRepository memberCommandRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("OAuth2 Login 성공!");
         try {
             CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
-            Member member = memberQueryRepository.findBySocialId(oAuth2User.getId())
+            Member member = memberCommandRepository.findBySocialId(oAuth2User.getId())
                     .orElseThrow(() -> new TokenException(ErrorCode.NOT_EXIST_USER));
 
             // 처음 요청한 회원
