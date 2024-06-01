@@ -5,6 +5,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import moaboa.auth.global.error.ErrorCode;
 import moaboa.auth.global.error.TokenException;
+import moaboa.auth.member.Member;
+import moaboa.auth.member.dto.MemberRequestDto;
+import moaboa.auth.member.repository.command.MemberCommandRepository;
 import moaboa.auth.token.jwt.JwtUtil;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 public class AuthServiceImpl implements AuthService{
 
     private final JwtUtil jwtUtil;
+    private final MemberCommandRepository commandRepository;
 
     private static final String USER_HEADER = "User";
 
@@ -34,6 +38,19 @@ public class AuthServiceImpl implements AuthService{
         String memberId = jwtUtil.extractId(accessToken)
                 .orElseThrow(() -> new TokenException(ErrorCode.BAD_REQUEST));
         return Long.parseLong(memberId);
+    }
+
+    @Override
+    public Long tempSignup(MemberRequestDto.CreateDto request, HttpServletResponse response) {
+        Member createdMember = commandRepository.save(Member.from(request));
+        setAccessToken(createdMember.getId(), response);
+        return createdMember.getId();
+    }
+
+    @Override
+    public void setAccessToken(Long memberId, HttpServletResponse response) {
+        String token = jwtUtil.createAccessToken(memberId);
+        jwtUtil.setAccessTokenHeader(response, token);
     }
 
     @Override
