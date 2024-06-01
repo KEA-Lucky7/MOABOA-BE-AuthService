@@ -23,14 +23,14 @@ public class RefreshTokenRepository {
     }
 
     public void save(final String refreshToken, final Long memberId) {
-        ValueOperations<String, Long> valueOperations = redisTemplate.opsForValue();
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         log.info("refresh Token 저장");
-        valueOperations.set(refreshToken, memberId);
+        valueOperations.set(refreshToken, String.valueOf(memberId));
         redisTemplate.expire(refreshToken, refreshExpirePeriod, TimeUnit.SECONDS);
     }
 
-    public Optional<Long> findMemberIdByToken(final String refreshToken) {
-        ValueOperations<String, Long> valueOperations = redisTemplate.opsForValue();
+    public Optional<String> findMemberIdByToken(final String refreshToken) {
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         return Optional.ofNullable(valueOperations.get(refreshToken));
     }
 }
