@@ -72,6 +72,7 @@ public class JwtUtil {
     private String createRefreshToken(Long id) {
         String key = UUID.randomUUID().toString();
         refreshTokenRepository.save(key, id);
+        log.info("리프레시 토큰: {}", key);
         return key;
     }
 
@@ -93,7 +94,7 @@ public class JwtUtil {
 
         setAccessTokenHeader(response, accessToken);
         setRefreshTokenHeader(response, refreshToken);
-        log.info("Access Token, Refresh Token 헤더 설정 완료");
+        log.info("Access Token: {}, Refresh Token: {} 헤더 설정 완료", accessToken, refreshToken);
     }
 
     public Optional<String> extractAccessToken(HttpServletRequest request) {
