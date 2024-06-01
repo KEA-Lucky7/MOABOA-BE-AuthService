@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import moaboa.auth.global.BaseEntity;
 import moaboa.auth.global.State;
+import moaboa.auth.member.dto.MemberRequestDto;
 import moaboa.auth.oauth2.SocialType;
 
 import java.time.LocalDate;
@@ -41,4 +42,16 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private State state;
+
+    public static Member from(MemberRequestDto.CreateDto request) {
+        return Member.builder()
+                .nickname(request.getNickname())
+                .socialId(request.getSocialId())
+                .socialType(SocialType.KAKAO)
+                .role(Role.MEMBER)
+                .about("테스트 유저랍니다~")
+                .birth(request.getBirthdate())
+                .state(State.ACTIVE)
+                .build();
+    }
 }
