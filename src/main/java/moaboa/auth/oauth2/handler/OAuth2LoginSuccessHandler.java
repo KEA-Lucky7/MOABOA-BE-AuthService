@@ -7,12 +7,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import moaboa.auth.global.error.ErrorCode;
 import moaboa.auth.global.error.TokenException;
-import moaboa.auth.member.repository.command.MemberCommandRepository;
-import moaboa.auth.token.jwt.JwtUtil;
-import moaboa.auth.oauth2.userinfo.CustomOAuth2User;
-import moaboa.auth.member.Role;
 import moaboa.auth.member.Member;
-import moaboa.auth.member.repository.query.MemberQueryRepository;
+import moaboa.auth.member.Role;
+import moaboa.auth.member.repository.command.MemberCommandRepository;
+import moaboa.auth.oauth2.userinfo.CustomOAuth2User;
+import moaboa.auth.token.jwt.JwtUtil;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -38,7 +37,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             // 처음 요청한 회원
             if (member.getRole() == Role.GUEST) {
                 String accessToken = jwtUtil.createAccessToken(member.getId());
-                String refreshToken = jwtUtil.getRefreshToken(member.getId());
+                String refreshToken = jwtUtil.setRefreshToken(member.getId());
 
                 jwtUtil.sendAccessAndRefreshToken(response, accessToken, refreshToken);
 
@@ -52,12 +51,12 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         }
     }
 
-    private void loginSuccess(HttpServletResponse response, Member member) throws IOException {
+    private void loginSuccess(HttpServletResponse response, Member member) {
         log.info("로그인 성공!");
         String accessToken = jwtUtil.createAccessToken(member.getId());
-        String refreshToken = jwtUtil.getRefreshToken(member.getId());
+        String refreshToken = jwtUtil.setRefreshToken(member.getId());
         response.addHeader(jwtUtil.getAccessHeader(), "Bearer " + accessToken);
-        response.addHeader(jwtUtil.getRefreshHeader(), "Bearer " + refreshToken);
+        response.addHeader(jwtUtil.getRefreshHeader(), refreshToken);
 
         jwtUtil.sendAccessAndRefreshToken(response, accessToken, refreshToken);
     }

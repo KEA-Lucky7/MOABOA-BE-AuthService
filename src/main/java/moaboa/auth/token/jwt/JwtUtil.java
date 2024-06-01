@@ -75,26 +75,14 @@ public class JwtUtil {
         return key;
     }
 
-    public String getRefreshToken(Long id) {
-        Long userId = memberQueryRepository.findById(id)
+    public String setRefreshToken(Long id) {
+        Long memberId = memberQueryRepository.findById(id)
                 .orElse(memberCommandRepository
                         .findById(id)
                         .orElseThrow(() -> new TokenException(ErrorCode.NOT_EXIST_USER)))
                 .getId();
 
-        return findRefreshToken(userId);
-    }
-
-    /**
-     * 리프레시 토큰 가져오는 메소드
-     * redis에 존재하는 경우 가져오고 존재하지 않다면 새로 생성
-     * */
-    private String findRefreshToken(Long userId) {
-        return refreshTokenRepository.findById(userId)
-                .orElseGet(() -> {
-                    log.info("refreshToken 재발급");
-                    return createRefreshToken(userId);
-                });
+        return createRefreshToken(memberId);
     }
 
     /**
