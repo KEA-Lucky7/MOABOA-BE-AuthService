@@ -26,7 +26,7 @@ import static moaboa.auth.oauth2.SocialType.KAKAO;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-    private final MemberQueryRepository memberQueryRepository;
+//    private final MemberQueryRepository memberQueryRepository;
     private final MemberCommandRepository memberCommandRepository;
 
     @Override
@@ -71,7 +71,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private Member findUser(SocialType socialType, OAuthAttributes attributes) {
-        Optional<Member> optionalUser = memberQueryRepository.findBySocialTypeAndSocialId(socialType, attributes.getOauth2UserInfo().getId());
+        Optional<Member> optionalUser = memberCommandRepository.findBySocialTypeAndSocialId(socialType, attributes.getOauth2UserInfo().getId());
         return optionalUser.orElseGet(() -> saveUser(socialType, attributes));
     }
 
