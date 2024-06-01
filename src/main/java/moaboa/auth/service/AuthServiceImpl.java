@@ -43,11 +43,12 @@ public class AuthServiceImpl implements AuthService{
     @Override
     public Long tempSignup(MemberRequestDto.CreateDto request, HttpServletResponse response) {
         Member createdMember = commandRepository.save(Member.from(request));
+        setAccessToken(createdMember.getId(), response);
         return createdMember.getId();
     }
 
     @Override
-    public void tokenReissue(Long memberId, HttpServletResponse response) {
+    public void setAccessToken(Long memberId, HttpServletResponse response) {
         String token = jwtUtil.createAccessToken(memberId);
         jwtUtil.setAccessTokenHeader(response, token);
     }

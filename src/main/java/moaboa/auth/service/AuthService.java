@@ -14,5 +14,5 @@ public interface AuthService {
 
     Long tempSignup(MemberRequestDto.CreateDto request, HttpServletResponse response);
 
-    void tokenReissue(Long memberId, HttpServletResponse response);
+    void setAccessToken(Long memberId, HttpServletResponse response);
 }
