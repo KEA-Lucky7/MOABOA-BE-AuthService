@@ -35,7 +35,6 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final MemberCommandRepository memberCommandRepository;
-    private final MemberQueryRepository memberQueryRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 

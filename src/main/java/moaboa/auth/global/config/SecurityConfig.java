@@ -81,7 +81,7 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .addFilterBefore(new JwtAuthenticationProcessingFilter(jwtUtil, jwtUtil.getMemberQueryRepository(), refreshTokenRepository),
+                .addFilterBefore(new JwtAuthenticationProcessingFilter(jwtUtil, jwtUtil.getMemberCommandRepository(), refreshTokenRepository),
                         UsernamePasswordAuthenticationFilter.class
                 )
                 .addFilterBefore(exceptionFilter(), JwtAuthenticationProcessingFilter.class)
