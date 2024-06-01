@@ -2,6 +2,7 @@ package moaboa.auth.oauth2.userinfo;
 
 import lombok.Builder;
 import lombok.Getter;
+import moaboa.auth.global.State;
 import moaboa.auth.oauth2.SocialType;
 import moaboa.auth.member.Role;
 import moaboa.auth.member.Member;
@@ -68,6 +69,7 @@ public class OAuthAttributes {
                 .role(Role.GUEST)
                 .socialType(socialType)
                 .socialId(oauth2UserInfo.getId())
+                .state(State.ACTIVE)
                 .build();
     }
 }
