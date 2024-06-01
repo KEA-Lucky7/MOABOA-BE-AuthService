@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import moaboa.auth.global.error.ErrorCode;
 import moaboa.auth.global.error.TokenException;
+import moaboa.auth.member.repository.command.MemberCommandRepository;
 import moaboa.auth.token.refresh.RefreshTokenRepository;
 import moaboa.auth.member.Member;
 import moaboa.auth.member.repository.query.MemberQueryRepository;
@@ -33,6 +34,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     private final JwtUtil jwtUtil;
+    private final MemberCommandRepository memberCommandRepository;
     private final MemberQueryRepository memberQueryRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
@@ -80,7 +82,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
         Long memberId = refreshTokenRepository.findMemberIdByToken(refreshToken)
                 .orElseThrow(() -> new TokenException(ErrorCode.EXPIRED_REFRESH_TOKEN));
-        jwtUtil.sendAccessAndRefreshToken(response, jwtUtil.reIssueAccessToken(memberId), jwtUtil.getRefreshToken(memberId));
+        jwtUtil.sendAccessAndRefreshToken(response, jwtUtil.reIssueAccessToken(memberId), jwtUtil.setRefreshToken(memberId));
     }
 
     public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
@@ -89,7 +91,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         Optional<Member> user = jwtUtil.extractAccessToken(request)
                 .filter(jwtUtil::isAccessTokenValid)
                 .flatMap(accessToken -> jwtUtil.extractId(accessToken)
-                        .flatMap(id -> memberQueryRepository.findById(Long.parseLong(id))));
+                        .flatMap(id -> memberCommandRepository.findById(Long.parseLong(id))));
                 user.ifPresent(this::saveAuthentication);
 
         filterChain.doFilter(request, response);
