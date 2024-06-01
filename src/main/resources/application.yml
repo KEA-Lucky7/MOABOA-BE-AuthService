@@ -1,6 +1,16 @@
 spring:
   profiles:
     active: ${profile}
+    group:
+      local: common, local
+      dev: common, dev
+
+---
+spring:
+  config:
+    activate:
+      on-profile:
+        common
   data:
     redis:
       host: redis-database

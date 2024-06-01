@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -14,42 +15,31 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
+
 @Slf4j
 @Component
 public class OAuth2LoginFailureHandler implements AuthenticationFailureHandler {
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
-        response.setContentType("application/json;charset=UTF-8");
+        OAuth2Error oauth2Error = null;
+        String errorCode = "unauthorized";
+        String errorMessage = exception.getMessage();
 
         if (exception instanceof OAuth2AuthenticationException) {
-            OAuth2Error oauth2Error = ((OAuth2AuthenticationException) exception).getError();
-            String errorCode = oauth2Error.getErrorCode();
-            String errorMessage = oauth2Error.getDescription();
-
-            log.error("OAuth2 Error Code: {}, Error Description: {}", errorCode, errorMessage);
-
-            // 응답 본문 로깅을 위한 추가적인 처리
-            try {
-                String responseBody = new String(request.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-                log.error("OAuth2 Error Response Body: {}", responseBody);
-            } catch (IOException e) {
-                log.error("Error reading response body", e);
-            }
-
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            PrintWriter out = response.getWriter();
-            out.print("{\"error\": \"" + errorCode + "\", \"error_description\": \"" + errorMessage + "\"}");
-            out.flush();
-        } else {
-            log.error("Authentication failed: {}", exception.getMessage());
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            PrintWriter out = response.getWriter();
-            out.print("{\"error\": \"unauthorized\", \"error_description\": \"" + exception.getMessage() + "\"}");
-            out.flush();
+            oauth2Error = ((OAuth2AuthenticationException) exception).getError();
+            errorCode = oauth2Error.getErrorCode();
+            errorMessage = oauth2Error.getDescription();
         }
 
-        log.info("Authentication failure: {}", exception.getMessage());
+        log.error("OAuth2 Error Code: {}, Error Description: {}", errorCode, errorMessage);
+
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        out.print("{\"error\": \"" + errorCode + "\", \"error_description\": \"" + errorMessage + "\"}");
+        out.flush();
+
         errorTrace(exception);
     }
 
