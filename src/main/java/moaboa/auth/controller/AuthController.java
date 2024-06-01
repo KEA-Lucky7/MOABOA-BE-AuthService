@@ -39,4 +39,10 @@ public class AuthController {
         Long memberId = authService.tempSignup(request, response);
         return ResponseEntity.ok().body(memberId);
     }
+
+    @GetMapping("/token/reissue")
+    public ResponseEntity<HttpStatus> tokenReissue(@RequestParam Long memberId, HttpServletResponse response) {
+        authService.tokenReissue(memberId, response);
+        return ResponseEntity.ok().build();
+    }
 }

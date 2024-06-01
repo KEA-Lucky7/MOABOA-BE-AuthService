@@ -47,6 +47,12 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
+    public void tokenReissue(Long memberId, HttpServletResponse response) {
+        String token = jwtUtil.createAccessToken(memberId);
+        jwtUtil.setAccessTokenHeader(response, token);
+    }
+
+    @Override
     public void giveTemporaryToken(Long id, HttpServletResponse response) {
         jwtUtil.setAccessTokenHeader(response, jwtUtil.createAccessToken(id));
     }
