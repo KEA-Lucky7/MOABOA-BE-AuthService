@@ -41,8 +41,10 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
                 jwtUtil.sendAccessAndRefreshToken(response, accessToken, refreshToken);
 
+                String redirectUrl = "http://localhost:5173/login/redirect?access_code="+ accessToken + "&redirect_code=" + refreshToken;
+
                 // 프런트에 회원가입 페이지 리다이렉션
-                response.sendRedirect("http://localhost:5173/login/redirect");
+                response.sendRedirect(redirectUrl);
             } else {
                 loginSuccess(response, member); // 로그인에 성공한 경우 access, refresh 토큰 생성
             }
