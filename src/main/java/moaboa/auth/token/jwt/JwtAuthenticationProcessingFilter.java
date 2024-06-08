@@ -30,7 +30,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
-    private static final String[] NO_CHECK_URL = {"/login/*", "/auth/health", "/auth/*", "/favicon.ico"};
+    private static final String[] NO_CHECK_URL = {"/login/*", "/auth/health", "/auth/metrics", "/auth/prometheus", "/auth/*", "/favicon.ico"};
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     private final JwtUtil jwtUtil;
