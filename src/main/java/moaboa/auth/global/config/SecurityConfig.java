@@ -58,6 +58,7 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/auth/token"),
                                 new AntPathRequestMatcher("/auth/health"),
                                 new AntPathRequestMatcher("/auth/prometheus"),
+                                new AntPathRequestMatcher("/auth/metrics"),
                                 new AntPathRequestMatcher("/"),
                                 new AntPathRequestMatcher("/index.html"),
                                 new AntPathRequestMatcher("/h2-console/**"),
