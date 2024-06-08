@@ -57,20 +57,22 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/auth/token/validation"),
                                 new AntPathRequestMatcher("/auth/token"),
                                 new AntPathRequestMatcher("/auth/health"),
+                                new AntPathRequestMatcher("/auth/prometheus"),
                                 new AntPathRequestMatcher("/"),
                                 new AntPathRequestMatcher("/index.html"),
                                 new AntPathRequestMatcher("/h2-console/**"),
                                 new AntPathRequestMatcher("/login/**"),
                                 new AntPathRequestMatcher("/oauth2/**"),
                                 new AntPathRequestMatcher("/css/**"),
-                                new AntPathRequestMatcher("/html/**")
+                                new AntPathRequestMatcher("/html/**"),
+                                new AntPathRequestMatcher("/favicon.ico")
                         ).permitAll()
                         .requestMatchers(
                                 new AntPathRequestMatcher("/api/members/createUser")
                         ).hasRole(Role.GUEST.name())
                         .requestMatchers(
                                 new AntPathRequestMatcher("/auth/**")
-                        ).authenticated()
+                        ).hasRole(Role.MEMBER.name())
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2

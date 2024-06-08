@@ -30,7 +30,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
-    private static final String[] NO_CHECK_URL = {"/login/*", "/auth/health", "/auth/token"};
+    private static final String[] NO_CHECK_URL = {"/login/*", "/auth/health", "/auth/*", "/favicon.ico"};
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     private final JwtUtil jwtUtil;
@@ -41,16 +41,13 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
-        for (String pattern : NO_CHECK_URL) {
-            if (pathMatcher.match(pattern, requestURI)) {
-                filterChain.doFilter(request, response);
-                return; // 이후 현재 필터 진행 막기
-            }
+        if (isNoCheckURL(requestURI)) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        // 사용자 요청 헤더에서 RefreshToken 추출
-        // -> RefreshToken이 없거나 유효 X or DB에 저장된 RefreshToken과 다르다면 => null 반환
-        // 사용자의 요청 헤더에 RefreshToken이 있는 경우는, AccessToken이 만료되어 요청한 경우
+        // RefreshToken이 없거나 유효 X or DB에 저장된 RefreshToken과 다르다면 => null
+        // RefreshToken이 O -> AccessToken이 만료되어 요청한 경우
         // 따라서, 위의 경우를 제외하면 추출한 refreshToken은 모두 null
         String refreshToken = jwtUtil.extractRefreshToken(request)
                 .orElse(null);
@@ -64,11 +61,20 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         }
 
         // RefreshToken이 없거나 유효하지 않다면, AccessToken을 검사하고 인증을 처리하는 로직 수행
-        // AccessToken이 없거나 유효하지 않다면, 인증 객체가 담기지 않은 상태로 다음 필터로 넘어가기 때문에 403 에러 발생
+        // AccessToken이 없거나 유효하지 않다면, 인증 객체가 담기지 않은 상태로 다음 필터로 넘어가기 때문에 403 Error
         // AccessToken이 유효하다면, 인증 객체가 담긴 상태로 다음 필터로 넘어가기 때문에 인증 성공
         if (refreshToken == null) {
             checkAccessTokenAndAuthentication(request, response, filterChain);
         }
+    }
+
+    private boolean isNoCheckURL(String requestURI) {
+        for (String pattern : NO_CHECK_URL) {
+            if (pathMatcher.match(pattern, requestURI)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
