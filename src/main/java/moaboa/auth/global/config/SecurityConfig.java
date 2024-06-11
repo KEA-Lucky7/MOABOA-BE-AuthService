@@ -82,7 +82,7 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                 )
                 .sessionManagement(sessionManagement ->
-                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
                 .addFilterBefore(new JwtAuthenticationProcessingFilter(jwtUtil, jwtUtil.getMemberCommandRepository(), refreshTokenRepository),
                         UsernamePasswordAuthenticationFilter.class
