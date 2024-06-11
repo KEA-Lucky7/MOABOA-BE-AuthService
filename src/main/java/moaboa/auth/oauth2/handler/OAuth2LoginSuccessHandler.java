@@ -41,7 +41,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
                 jwtUtil.sendAccessAndRefreshToken(response, accessToken, refreshToken);
 
-                String redirectUrl = "http://localhost:5173/login/redirect?access_code="+ accessToken + "&redirect_code=" + refreshToken;
+                String redirectUrl = "https://moaboa.shop/login/redirect?access_code="+ accessToken + "&redirect_code=" + refreshToken;
 
                 // 프런트에 회원가입 페이지 리다이렉션
                 response.sendRedirect(redirectUrl);
